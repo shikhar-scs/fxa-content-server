@@ -333,7 +333,6 @@ define(function (require, exports, module) {
     setSignedInAccount (accountData) {
       var account = this.initAccount(accountData);
       account.set('lastLogin', Date.now());
-
       return this.setAccount(account)
         .then((account) => {
           this._cachedSignedInAccount = account;
@@ -345,7 +344,6 @@ define(function (require, exports, module) {
     // Hydrate the account then persist it
     setAccount (accountData) {
       var account = this.initAccount(accountData);
-
       return account.fetch()
         .then(() => {
           this._persistAccount(account);
@@ -477,7 +475,6 @@ define(function (require, exports, module) {
             }));
             account = oldAccount;
           }
-
           this._notifyOfAccountSignIn(account);
           return this.setSignedInAccount(account);
         });
