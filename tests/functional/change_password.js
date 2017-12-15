@@ -1,155 +1,152 @@
+'use strict';
+
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+const intern = require('intern');
+const registerSuite = require('intern!object');
+const TestHelpers = require('tests/lib/helpers');
+const FunctionalHelpers = require('tests/functional/lib/helpers');
+const selectors = require('tests/functional/lib/selectors');
 
-define([
-  'intern',
-  'intern!object',
-  'tests/lib/helpers',
-  'tests/functional/lib/helpers',
-  'tests/functional/lib/selectors'
-], function (intern, registerSuite, TestHelpers, FunctionalHelpers, selectors) {
-  'use strict';
+const config = intern.config;
+const SIGNIN_URL = config.fxaContentRoot + 'signin';
 
-  const config = intern.config;
-  const SIGNIN_URL = config.fxaContentRoot + 'signin';
+const ANIMATION_DELAY_MS = 500;
+const FIRST_PASSWORD = 'password';
+const SECOND_PASSWORD = 'new_password';
 
-  const ANIMATION_DELAY_MS = 500;
-  const FIRST_PASSWORD = 'password';
-  const SECOND_PASSWORD = 'new_password';
+let email;
 
-  let email;
+const {
+  clearBrowserState,
+  click,
+  createUser,
+  denormalizeStoredEmail,
+  fillOutChangePassword,
+  fillOutSignIn,
+  noSuchElementDisplayed,
+  openPage,
+  testElementExists,
+  testElementTextEquals,
+  thenify,
+  type,
+  visibleByQSA,
+} = FunctionalHelpers;
 
-  const {
-    clearBrowserState,
-    click,
-    createUser,
-    denormalizeStoredEmail,
-    fillOutChangePassword,
-    fillOutSignIn,
-    noSuchElementDisplayed,
-    openPage,
-    testElementExists,
-    testElementTextEquals,
-    thenify,
-    type,
-    visibleByQSA,
-  } = FunctionalHelpers;
+const setupTest = thenify(function (options = {}) {
+  const signUpEmail = options.signUpEmail || email;
+  const signInEmail = options.signInEmail || email;
 
-  const setupTest = thenify(function (options = {}) {
-    const signUpEmail = options.signUpEmail || email;
-    const signInEmail = options.signInEmail || email;
+  return this.parent
+    .then(createUser(signUpEmail, FIRST_PASSWORD, { preVerified: true }))
+    .then(clearBrowserState())
+    .then(openPage(SIGNIN_URL, selectors.SIGNIN.HEADER))
+    .then(fillOutSignIn(signInEmail, FIRST_PASSWORD))
 
-    return this.parent
-      .then(createUser(signUpEmail, FIRST_PASSWORD, { preVerified: true }))
-      .then(clearBrowserState())
+    .then(testElementExists(selectors.SETTINGS.HEADER))
+    .then(testElementTextEquals(selectors.SETTINGS.PROFILE_HEADER, signUpEmail));
+});
+
+registerSuite({
+  name: 'change_password',
+
+  beforeEach: function () {
+    email = TestHelpers.createEmail();
+  },
+
+  afterEach: function () {
+    return this.remote.then(clearBrowserState());
+  },
+
+  'sign in, try to change password with an incorrect old password': function () {
+    return this.remote
+      .then(setupTest())
+
+      // Go to change password screen
+      .then(click(selectors.CHANGE_PASSWORD.MENU_BUTTON))
+      .then(fillOutChangePassword('INCORRECT', SECOND_PASSWORD, { expectSuccess: false }))
+      // the validation tooltip should be visible
+      .then(visibleByQSA(selectors.CHANGE_PASSWORD.TOOLTIP))
+
+      // click the show button, the error should not be hidden.
+      .then(click(selectors.CHANGE_PASSWORD.OLD_PASSWORD_SHOW))
+      .then(visibleByQSA(selectors.CHANGE_PASSWORD.TOOLTIP))
+
+      // Change form so that it is valid, error should be hidden.
+      .then(type(selectors.CHANGE_PASSWORD.OLD_PASSWORD, FIRST_PASSWORD))
+
+      // Since the test is to see if the error is hidden,
+      // .findByClass cannot be used. We want the opposite of
+      // .findByClass.
+      .sleep(ANIMATION_DELAY_MS)
+
+      .then(noSuchElementDisplayed(selectors.CHANGE_PASSWORD.ERROR));
+  },
+
+  'sign in, change password, sign in with new password': function () {
+    return this.remote
+      .then(setupTest())
+
+      // Go to change password screen
+      .then(click(selectors.CHANGE_PASSWORD.MENU_BUTTON))
+
+      .then(fillOutChangePassword(FIRST_PASSWORD, SECOND_PASSWORD))
+
       .then(openPage(SIGNIN_URL, selectors.SIGNIN.HEADER))
-      .then(fillOutSignIn(signInEmail, FIRST_PASSWORD))
+      .then(click(selectors.SIGNIN.LINK_USE_DIFFERENT))
+      .then(fillOutSignIn(email, SECOND_PASSWORD))
 
-      .then(testElementExists(selectors.SETTINGS.HEADER))
-      .then(testElementTextEquals(selectors.SETTINGS.PROFILE_HEADER, signUpEmail));
-  });
+      .then(testElementExists(selectors.SETTINGS.HEADER));
+  },
 
-  registerSuite({
-    name: 'change_password',
+  'sign in with an unnormalized email, change password, sign in with new password': function () {
+    return this.remote
+      .then(setupTest({ signInEmail: email.toUpperCase(), signUpEmail: email }))
 
-    beforeEach: function () {
-      email = TestHelpers.createEmail();
-    },
+      // Go to change password screen
+      .then(click(selectors.CHANGE_PASSWORD.MENU_BUTTON))
 
-    afterEach: function () {
-      return this.remote.then(clearBrowserState());
-    },
+      .then(fillOutChangePassword(FIRST_PASSWORD, SECOND_PASSWORD))
 
-    'sign in, try to change password with an incorrect old password': function () {
-      return this.remote
-        .then(setupTest())
+      .then(openPage(SIGNIN_URL, selectors.SIGNIN.HEADER))
+      .then(click(selectors.SIGNIN.LINK_USE_DIFFERENT))
+      .then(fillOutSignIn(email, SECOND_PASSWORD))
 
-        // Go to change password screen
-        .then(click(selectors.CHANGE_PASSWORD.MENU_BUTTON))
-        .then(fillOutChangePassword('INCORRECT', SECOND_PASSWORD, { expectSuccess: false }))
-        // the validation tooltip should be visible
-        .then(visibleByQSA(selectors.CHANGE_PASSWORD.TOOLTIP))
+      .then(testElementExists(selectors.SETTINGS.HEADER));
+  },
 
-        // click the show button, the error should not be hidden.
-        .then(click(selectors.CHANGE_PASSWORD.OLD_PASSWORD_SHOW))
-        .then(visibleByQSA(selectors.CHANGE_PASSWORD.TOOLTIP))
+  'cached unnormalized email, change password, sign in with new password': function () {
+    return this.remote
+      .then(setupTest())
 
-        // Change form so that it is valid, error should be hidden.
-        .then(type(selectors.CHANGE_PASSWORD.OLD_PASSWORD, FIRST_PASSWORD))
+      // synthesize a user who signed in pre #4470 with an unnormalized email
+      .then(denormalizeStoredEmail(email))
+      // refresh to load denormalized email from localStorage
+      .refresh()
+      // email should be normalized on refresh!
+      .then(testElementTextEquals(selectors.SETTINGS.PROFILE_HEADER, email))
 
-        // Since the test is to see if the error is hidden,
-        // .findByClass cannot be used. We want the opposite of
-        // .findByClass.
-        .sleep(ANIMATION_DELAY_MS)
+      .then(click(selectors.CHANGE_PASSWORD.MENU_BUTTON))
 
-        .then(noSuchElementDisplayed(selectors.CHANGE_PASSWORD.ERROR));
-    },
+      .then(fillOutChangePassword(FIRST_PASSWORD, SECOND_PASSWORD))
 
-    'sign in, change password, sign in with new password': function () {
-      return this.remote
-        .then(setupTest())
+      .then(openPage(SIGNIN_URL, selectors.SIGNIN.HEADER))
+      .then(click(selectors.SIGNIN.LINK_USE_DIFFERENT))
+      .then(fillOutSignIn(email, SECOND_PASSWORD))
 
-        // Go to change password screen
-        .then(click(selectors.CHANGE_PASSWORD.MENU_BUTTON))
-
-        .then(fillOutChangePassword(FIRST_PASSWORD, SECOND_PASSWORD))
-
-        .then(openPage(SIGNIN_URL, selectors.SIGNIN.HEADER))
-        .then(click(selectors.SIGNIN.LINK_USE_DIFFERENT))
-        .then(fillOutSignIn(email, SECOND_PASSWORD))
-
-        .then(testElementExists(selectors.SETTINGS.HEADER));
-    },
-
-    'sign in with an unnormalized email, change password, sign in with new password': function () {
-      return this.remote
-        .then(setupTest({ signInEmail: email.toUpperCase(), signUpEmail: email }))
-
-        // Go to change password screen
-        .then(click(selectors.CHANGE_PASSWORD.MENU_BUTTON))
-
-        .then(fillOutChangePassword(FIRST_PASSWORD, SECOND_PASSWORD))
-
-        .then(openPage(SIGNIN_URL, selectors.SIGNIN.HEADER))
-        .then(click(selectors.SIGNIN.LINK_USE_DIFFERENT))
-        .then(fillOutSignIn(email, SECOND_PASSWORD))
-
-        .then(testElementExists(selectors.SETTINGS.HEADER));
-    },
-
-    'cached unnormalized email, change password, sign in with new password': function () {
-      return this.remote
-        .then(setupTest())
-
-        // synthesize a user who signed in pre #4470 with an unnormalized email
-        .then(denormalizeStoredEmail(email))
-        // refresh to load denormalized email from localStorage
-        .refresh()
-        // email should be normalized on refresh!
-        .then(testElementTextEquals(selectors.SETTINGS.PROFILE_HEADER, email))
-
-        .then(click(selectors.CHANGE_PASSWORD.MENU_BUTTON))
-
-        .then(fillOutChangePassword(FIRST_PASSWORD, SECOND_PASSWORD))
-
-        .then(openPage(SIGNIN_URL, selectors.SIGNIN.HEADER))
-        .then(click(selectors.SIGNIN.LINK_USE_DIFFERENT))
-        .then(fillOutSignIn(email, SECOND_PASSWORD))
-
-        .then(testElementExists(selectors.SETTINGS.HEADER));
-    },
+      .then(testElementExists(selectors.SETTINGS.HEADER));
+  },
 
 
-    'sign in, reset password via settings works': function () {
-      return this.remote
-        .then(setupTest())
+  'sign in, reset password via settings works': function () {
+    return this.remote
+      .then(setupTest())
 
-        // Go to change password screen
-        .then(click(selectors.CHANGE_PASSWORD.MENU_BUTTON))
-        .then(click(selectors.CHANGE_PASSWORD.LINK_RESET_PASSWORD))
+      // Go to change password screen
+      .then(click(selectors.CHANGE_PASSWORD.MENU_BUTTON))
+      .then(click(selectors.CHANGE_PASSWORD.LINK_RESET_PASSWORD))
 
-        .then(testElementExists(selectors.RESET_PASSWORD.HEADER));
-    }
-  });
+      .then(testElementExists(selectors.RESET_PASSWORD.HEADER));
+  }
 });
