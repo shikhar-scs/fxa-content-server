@@ -62,8 +62,8 @@ registerSuite({
 
       .then(openVerificationLinkInNewTab(email, 0))
       .then(switchToWindow(1))
-        .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
-        .then(closeCurrentWindow())
+      .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
+      .then(closeCurrentWindow())
 
       .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER));
   },
@@ -107,8 +107,8 @@ registerSuite({
 
       .then(openVerificationLinkInNewTab(email, 0, { query }))
       .then(switchToWindow(1))
-        .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER))
-        .then(closeCurrentWindow())
+      .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER))
+      .then(closeCurrentWindow())
 
       .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER));
   },
@@ -136,8 +136,8 @@ registerSuite({
 
       .then(openVerificationLinkInNewTab(email, 0, { query }))
       .then(switchToWindow(1))
-        .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
-        .then(closeCurrentWindow())
+      .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
+      .then(closeCurrentWindow())
 
       .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER));
   },
@@ -167,8 +167,8 @@ registerSuite({
       // Get the 2nd email, the 1st was sent for createUser
       .then(openVerificationLinkInNewTab(email, 1))
       .then(switchToWindow(1))
-        .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
-        .then(closeCurrentWindow())
+      .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
+      .then(closeCurrentWindow())
 
       .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER));
   },

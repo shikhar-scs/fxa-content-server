@@ -65,8 +65,8 @@ registerSuite({
 
       .then(openVerificationLinkInNewTab(email, 0, { query: { forceExperiment: 'cadOnSignin', forceExperimentGroup: 'control' }}))
       .then(switchToWindow(1))
-        .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER))
-        .then(closeCurrentWindow())
+      .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER))
+      .then(closeCurrentWindow())
 
       // about:accounts will take over post-verification, no transition
       .then(noPageTransition(selectors.CONFIRM_SIGNIN.HEADER));
@@ -96,8 +96,8 @@ registerSuite({
 
       .then(openVerificationLinkInNewTab(email, 0, { query: { forceExperiment: 'cadOnSignin', forceExperimentGroup: 'treatment' }}))
       .then(switchToWindow(1))
-        .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
-        .then(closeCurrentWindow())
+      .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
+      .then(closeCurrentWindow())
 
       // about:accounts will take over post-verification, no transition
       .then(noPageTransition(selectors.CONFIRM_SIGNIN.HEADER));
@@ -127,8 +127,8 @@ registerSuite({
 
       .then(openVerificationLinkInNewTab(email, 0))
       .then(switchToWindow(1))
-        .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER))
-        .then(closeCurrentWindow())
+      .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER))
+      .then(closeCurrentWindow())
 
       // about:accounts will take over post-verification, no transition
       .then(noPageTransition(selectors.CONFIRM_SIGNIN.HEADER));
@@ -157,8 +157,8 @@ registerSuite({
 
       .then(openVerificationLinkInNewTab(email, 0))
       .then(switchToWindow(1))
-        .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER))
-        .then(closeCurrentWindow())
+      .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER))
+      .then(closeCurrentWindow())
 
       // about:accounts will take over post-verification, no transition
       .then(noPageTransition(selectors.CONFIRM_SIGNIN.HEADER));
