@@ -53,9 +53,7 @@ var setupTest = thenify(function (options) {
     });
 });
 
-registerSuite({
-  name: 'Firefox Desktop Sync v2 sign_in',
-
+registerSuite('Firefox Desktop Sync v2 sign_in', {
   beforeEach: function () {
     email = TestHelpers.createEmail('sync{id}');
   },

@@ -48,9 +48,7 @@ const setupTest = thenify(function (options = {}) {
     .then(testElementTextEquals(selectors.SETTINGS.PROFILE_HEADER, signUpEmail));
 });
 
-registerSuite({
-  name: 'change_password',
-
+registerSuite('change_password', {
   beforeEach: function () {
     email = TestHelpers.createEmail();
   },
@@ -137,7 +135,6 @@ registerSuite({
 
       .then(testElementExists(selectors.SETTINGS.HEADER));
   },
-
 
   'sign in, reset password via settings works': function () {
     return this.remote

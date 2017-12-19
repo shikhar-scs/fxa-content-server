@@ -34,9 +34,7 @@ const {
   visibleByQSA,
 } = FunctionalHelpers;
 
-registerSuite({
-  name: 'Firefox Desktop Sync v3 force_auth',
-
+registerSuite('Firefox Desktop Sync v3 force_auth', {
   beforeEach: function () {
     email = TestHelpers.createEmail('sync{id}');
   },
@@ -299,5 +297,5 @@ registerSuite({
 
       .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER))
       .then(testIsBrowserNotified('fxaccounts:login'));
-  },
+  }
 });
