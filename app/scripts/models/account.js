@@ -583,19 +583,17 @@ define(function (require, exports, module) {
     },
 
     /**
-     * Verify the account using the sign-in code
+     * Verify the account using the token code
      *
-     * @param {String} code - the sign-in code
-     * @param {Object} [options]
-     * @param {Object} [options.service] - the service issuing signup request
-     * @param {String} [options.serverVerificationStatus] - the status of server verification
+     * @param {String} code - the token code
      * @returns {Promise} - resolves when complete
      */
-    verifySignInCode (code, options = {}) {
-      return this._fxaClient.verifyCode(
+    verifyTokenCode (code) {
+      return this._fxaClient.verifyTokenCode(
+        this.get('sessionToken'),
         this.get('uid'),
-        code,
-        options);
+        code
+      );
     },
 
     /**

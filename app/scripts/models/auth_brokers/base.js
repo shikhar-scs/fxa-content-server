@@ -485,7 +485,11 @@ define(function (require, exports, module) {
       /**
        * Is signup supported? the fx_ios_v1 broker can disable it.
        */
-      signup: true
+      signup: true,
+      /**
+       * Are token codes flow supported?
+       */
+      tokenCode: true
     },
 
     /**

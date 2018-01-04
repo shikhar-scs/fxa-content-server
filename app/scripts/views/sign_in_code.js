@@ -51,7 +51,7 @@ define(function (require, exports, module) {
     },
 
     _getMissingSessionTokenScreen () {
-      var screenUrl = this.isSignUp() ? 'signup' : 'signin';
+      const screenUrl = this.isSignUp() ? 'signup' : 'signin';
       return this.broker.transformLink(screenUrl);
     },
 
@@ -69,7 +69,7 @@ define(function (require, exports, module) {
     submit () {
       const account = this.getAccount();
       const signInCode = this.getElementValue('#signin_code');
-      return account.verifySignInCode(signInCode)
+      return account.verifyTokenCode(signInCode)
         .then(() => {
           return this.invokeBrokerMethod('afterCompleteSignInCode', account);
         })

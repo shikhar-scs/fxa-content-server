@@ -45,13 +45,20 @@ define(function (require, exports, module) {
           // because we want to log the real action that is being performed.
           // This is important for the infamous signin-from-signup feature.
           this.logFlowEvent('attempt', 'signin');
+
+          // Override the verification
+          let verificationMethod;
+          if (this.getTokenCodeExperimentGroup() === 'treatment') {
+            verificationMethod = VerificationMethods.EMAIL_2FA;
+          }
+
           return this.user.signInAccount(account, password, this.relier, {
             // a resume token is passed in to allow
             // unverified account or session users to complete
             // email verification.
             resume: this.getStringifiedResumeToken(account),
             unblockCode: options.unblockCode,
-            verificationMethod: this.getSearchParam('verificationMethod')
+            verificationMethod: verificationMethod
           });
         })
         .then((account) => {

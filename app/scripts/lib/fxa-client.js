@@ -887,7 +887,17 @@ define(function (require, exports, module) {
      * @param {String} email The new primary email address
      * @return {Promise} resolves when complete
      */
-    recoveryEmailSetPrimaryEmail: createClientDelegate('recoveryEmailSetPrimaryEmail')
+    recoveryEmailSetPrimaryEmail: createClientDelegate('recoveryEmailSetPrimaryEmail'),
+
+    /**
+     * Verify token code used for logi.
+     *
+     * @param {String} sessionToken SessionToken obtained from signIn
+     * @param {String} uid account uid
+     * @param {String} code tokenCode
+     * @returns {Promise} resolves when complete
+     */
+    verifyTokenCode: createClientDelegate('verifyTokenCode')
   };
 
   module.exports = FxaClientWrapper;
